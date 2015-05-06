@@ -1,19 +1,25 @@
 <% require 'date' %>
 <% sensors.each do |sensor|%>
   <div class="col-md-3">
+  <% if(sensor[1]['type'] > 0) %>
+    <div class="panel panel-danger">
+  <% else %>
     <div class="panel panel-info">
+  <% end %>
       <div class="panel-heading">
         <h1 class="panel-title"><%=sensor[0]%></h1>
       </div>
       <div class="panel-body">
-        <% sensor[1].each do |readings| %>
-          <% if readings['Readings'] != nil %>
-            <% readings['Readings'].each do |event| %>
-              <%=event[1]%>
-              at <%=(Time.at(event[0].to_i / 1000)) %>
-              <br>
-            <% end %>
+        <% sensor[1]['Readings'].each do |reading| %>
+          <strong>
+          <% if reading[1] == 1 %>
+            Opened
+          <% else %>
+            Closed
           <% end %>
+          </strong>
+          at <%=Time.at(reading[0]/1000).ctime%>
+          <br>
         <% end %>
       </div>
     </div>

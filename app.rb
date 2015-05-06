@@ -4,7 +4,7 @@ require 'json'
 require 'httparty'
 require 'haml'
 require 'pp'
-
+require 'padrino-helpers'
 get "/" do
   begin
     response = HTTParty.post("http://shell.storm.pm:8079/api/query",{
@@ -111,8 +111,7 @@ get "/location/:name" do
     end
     results[source_name] = { 'type' => type, 'Readings' => readings }
   end
-  #erb :location, :locals => {:sensors => results}
-  results.inspect
+  erb :location, :locals => {:sensors => results}
 end
 
 get '/smapquery' do
