@@ -1,0 +1,21 @@
+<% require 'date' %>
+<% sensors.each do |sensor|%>
+  <div class="col-md-3">
+    <div class="panel panel-info">
+      <div class="panel-heading">
+        <h1 class="panel-title"><%=sensor[0]%></h1>
+      </div>
+      <div class="panel-body">
+        <% sensor[1].each do |readings| %>
+          <% if readings['Readings'] != nil %>
+            <% readings['Readings'].each do |event| %>
+              <%=event[1]%>
+              at <%=(Time.at(event[0].to_i / 1000)) %>
+              <br>
+            <% end %>
+          <% end %>
+        <% end %>
+      </div>
+    </div>
+  </div>
+<% end %>
