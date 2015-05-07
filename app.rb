@@ -74,7 +74,7 @@ get "/api/location/:name/sources" do
         end
       end
     end
-    readings.sort_by!{ |reading| reading[0] }
+    readings.sort_by!{ |reading| reading[0] }.reverse!
     results[source_name] = { 'type' => type, 'Readings' => readings }
   end
   #erb :location, :locals => {:sensors => results}
@@ -114,7 +114,7 @@ get "/location/:name" do
         end
       end
     end
-    readings.sort_by!{ |reading| reading[0] }
+    readings.sort_by!{ |reading| reading[0] }.reverse!
     results[source_name] = { 'type' => type, 'Readings' => readings }
   end
   erb :location, :locals => {:sensors => results}
