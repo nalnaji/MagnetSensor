@@ -58,15 +58,15 @@ get "/api/location/:name/sources" do
   readings = []
   sources.each do |source_name|
     response = HTTParty.post("http://shell.storm.pm:8079/api/query",{
-      :body => "select data before now where Metadata/SourceName='#{source_name}'",
+      :body => "select data in (now -10h, now) where Metadata/SourceName='#{source_name}'",
       :headers => { 'Content-Type' => 'text/plain', 'Accept' => '*/*' }
     })
     json = JSON.parse(response.body)
     readings = []
     type = 0
     json.each do |reading|
-      if reading['Readings'] != nil
-        if reading['Readings'][0][1][1] != nil
+      if reading['Readings'] != nil and reading['Readings'][0] != nil and reading['Readings'][0][1] 
+        if reading['Readings'][0] != nil and reading['Readings'][0][1] != nil and reading['Readings'][0][1][1] != nil
           type = reading['Readings'][0][1][1].to_i
         end
         readings.push([reading['Readings'][0][0], reading['Readings'][0][1][0].to_i])
@@ -74,13 +74,11 @@ get "/api/location/:name/sources" do
     end
     results[source_name] = { 'type' => type, 'Readings' => readings }
   end
-  #erb :location, :locals => {:sensors => results}
-  results.to_json
+  erb :location, :locals => {:sensors => results}
 end
 get "/location/:name" do
   response = HTTParty.post("http://shell.storm.pm:8079/api/query",{
     :body => "select * where Metadata/Location='#{params['name']}'",
-    #:body => "select data before now where Metadata/SourceName='Super Tommy'",
     :headers => { 'Content-Type' => 'text/plain', 'Accept' => '*/*' }
   })
   json = JSON.parse(response.body)
@@ -95,30 +93,33 @@ get "/location/:name" do
   readings = []
   sources.each do |source_name|
     response = HTTParty.post("http://shell.storm.pm:8079/api/query",{
-      :body => "select data before now where Metadata/SourceName='#{source_name}'",
+      :body => "select data in (now -5m, now) where Metadata/SourceName='#{source_name}'",
       :headers => { 'Content-Type' => 'text/plain', 'Accept' => '*/*' }
     })
     json = JSON.parse(response.body)
-    readings = []
     type = 0
-    json.each do |reading|
-      if reading['Readings'] != nil
-        if reading['Readings'][0][1][1] != nil
-          type = reading['Readings'][0][1][1].to_i
+    data =[]
+    json.each do |source_info|
+      readings = source_info['Readings']
+      if readings and !readings.empty?
+        type = readings.last[1][1].to_i
+        readings.each do |reading|
+          data.push([reading[0], reading[1][0].to_i])
         end
-        readings.push([reading['Readings'][0][0], reading['Readings'][0][1][0].to_i])
       end
     end
-    results[source_name] = { 'type' => type, 'Readings' => readings }
+    results[source_name] = {'type'=>type, 'Readings'=> data}
+    results[source_name]['Readings'].reverse!
   end
   erb :location, :locals => {:sensors => results}
+ 
 end
 
 get '/smapquery' do
   response = HTTParty.post("http://shell.storm.pm:8079/api/query",{
-    :body => "select data in (now -2m, now) where Metadata/SourceName='Super Tommy'",
-    :headers => { 'Content-Type' => 'text/plain', 'Accept' => '*/*' }
+      :body => "select data in (now -5m, now) where Metadata/SourceName='Jewels'",
+      :headers => { 'Content-Type' => 'text/plain', 'Accept' => '*/*' }
   })
   json = JSON.parse(response.body)
-  json.inspect
+  json.to_json
 end
