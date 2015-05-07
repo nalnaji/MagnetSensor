@@ -58,7 +58,7 @@ get "/api/location/:name/sources" do
   readings = []
   sources.each do |source_name|
     response = HTTParty.post("http://shell.storm.pm:8079/api/query",{
-      :body => "select data in (now -10h, now) where Metadata/SourceName='#{source_name}'",
+      :body => "select data in (now -3m, now) where Metadata/SourceName='#{source_name}'",
       :headers => { 'Content-Type' => 'text/plain', 'Accept' => '*/*' }
     })
     json = JSON.parse(response.body)
@@ -98,7 +98,7 @@ get "/location/:name" do
   readings = []
   sources.each do |source_name|
     response = HTTParty.post("http://shell.storm.pm:8079/api/query",{
-      :body => "select data in (now -10h, now) where Metadata/SourceName='#{source_name}'",
+      :body => "select data in (now -3m, now) where Metadata/SourceName='#{source_name}'",
       :headers => { 'Content-Type' => 'text/plain', 'Accept' => '*/*' }
     })
     json = JSON.parse(response.body)
